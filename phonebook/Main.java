@@ -13,7 +13,11 @@ public class Main {
 
     public static void main(String[] args) {
         SearchEngine searchEngine = new SearchEngine();
-        searchEngine.setSearchMethod(new LinearSeach());
+        SortEngine sortEngine = new SortEngine();
+
+        searchEngine.setSearchMethod(new LinearSearch());
+        sortEngine.setSortMethod(new BubbleSort());
+
         String pathToDirectory = "C:\\Users\\Leonid\\IdeaProjects\\Phone Book\\Phone Book\\task\\src\\directory.txt";
         String pathToFind = "C:\\Users\\Leonid\\IdeaProjects\\Phone Book\\Phone Book\\task\\src\\find.txt";
 
@@ -27,20 +31,43 @@ public class Main {
             System.out.println("Cannot read file: " + e.getMessage());
         }
 
-        long lStartTime = System.currentTimeMillis();
+        Timer firstTimer = new Timer();
+        Timer secondTimer = new Timer();
 
+        firstTimer.start();
         String[] numbers = searchEngine.searchNumbers(phoneBook, find);
+        firstTimer.stop();
 
-        long lEndTime = System.currentTimeMillis();
+        System.out.printf("Start searching (linear search)...\n" +
+                "Found %d / 500 entries. Time taken: %d min. %d sec. %d ms.\n",
+                numbers.length, firstTimer.minutes, firstTimer.seconds, firstTimer.milliseconds);
 
-        long output = lEndTime - lStartTime;
+        searchEngine.setSearchMethod(new JumpSearch());
 
-        long milliseconds = output % 1000;
-        long seconds = (int) (output / 1000) % 60 ;
-        long minutes = (int) ((output / (1000*60)) % 60);
+        firstTimer.start();
+        sortEngine.sort(phoneBook);
+        firstTimer.stop();
 
-        System.out.printf("Start searching...\n" +
-                "Found %d / 500 entries. Time taken: %d min. %d sec. %d ms.",
-                numbers.length, minutes, seconds, milliseconds);
+        String sortTime = String.format("%d min. %d sec. %d ms.",
+                firstTimer.minutes, firstTimer.seconds, firstTimer.milliseconds);
+
+        secondTimer.start();
+
+        numbers = searchEngine.searchNumbers(phoneBook, find);
+
+        secondTimer.stop();
+
+        String searchTime = String.format("%d min. %d sec. %d ms.",
+                secondTimer.minutes, secondTimer.seconds, secondTimer.milliseconds);
+
+        firstTimer.stop();
+
+        String resultTime = String.format("%d min. %d sec. %d ms.",
+                firstTimer.minutes, firstTimer.seconds, firstTimer.milliseconds);
+
+        System.out.println("Start searching (bubble sort + jump search)...");
+        System.out.printf("Found %d / 500 entries.Time taken:  %s\n", numbers.length, resultTime);
+        System.out.printf("Sorting time: %s\n", sortTime);
+        System.out.printf("Searching time: %s\n", searchTime);
     }
 }
