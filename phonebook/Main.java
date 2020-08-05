@@ -1,5 +1,7 @@
 package phonebook;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -15,9 +17,6 @@ public class Main {
         SearchEngine searchEngine = new SearchEngine();
         SortEngine sortEngine = new SortEngine();
 
-        searchEngine.setSearchMethod(new LinearSearch());
-        sortEngine.setSortMethod(new BubbleSort());
-
         String pathToDirectory = "C:\\Users\\Leonid\\IdeaProjects\\Phone Book\\Phone Book\\task\\src\\directory.txt";
         String pathToFind = "C:\\Users\\Leonid\\IdeaProjects\\Phone Book\\Phone Book\\task\\src\\find.txt";
 
@@ -31,6 +30,9 @@ public class Main {
             System.out.println("Cannot read file: " + e.getMessage());
         }
 
+
+        //linear search
+        searchEngine.setSearchMethod(new LinearSearch());
         Timer firstTimer = new Timer();
         Timer secondTimer = new Timer();
 
@@ -42,10 +44,13 @@ public class Main {
                 "Found %d / 500 entries. Time taken: %d min. %d sec. %d ms.\n",
                 numbers.length, firstTimer.minutes, firstTimer.seconds, firstTimer.milliseconds);
 
+
+        //bubble sort + jumpsearch
+        sortEngine.setSortMethod(new BubbleSort());
         searchEngine.setSearchMethod(new JumpSearch());
 
         firstTimer.start();
-        sortEngine.sort(phoneBook);
+        //sortEngine.sort(phoneBook);
         firstTimer.stop();
 
         String sortTime = String.format("%d min. %d sec. %d ms.",
@@ -53,7 +58,7 @@ public class Main {
 
         secondTimer.start();
 
-        numbers = searchEngine.searchNumbers(phoneBook, find);
+        //numbers = searchEngine.searchNumbers(phoneBook, find);
 
         secondTimer.stop();
 
@@ -69,5 +74,54 @@ public class Main {
         System.out.printf("Found %d / 500 entries.Time taken:  %s\n", numbers.length, resultTime);
         System.out.printf("Sorting time: %s\n", sortTime);
         System.out.printf("Searching time: %s\n", searchTime);
+
+        //quick sort + binary search
+        sortEngine.setSortMethod(new QuickSort());
+        searchEngine.setSearchMethod((new BinarySearch()));
+        firstTimer.start();
+        sortEngine.sort(phoneBook);
+        firstTimer.stop();
+
+        File sortDirectory = new File("C:\\Users\\Leonid\\IdeaProjects\\Phone Book\\Phone Book\\task\\src\\sortDirectory.txt");
+        File findNumbers = new File("C:\\Users\\Leonid\\IdeaProjects\\Phone Book\\Phone Book\\task\\src\\numbers.txt");
+
+        try (FileWriter writer = new FileWriter(sortDirectory)) {
+            for (String s : phoneBook) {
+                writer.write(s + "\n");
+            }
+        } catch (IOException e) {
+            System.out.printf("An exception occurs %s", e.getMessage());
+        }
+
+        sortTime = String.format("%d min. %d sec. %d ms.",
+                firstTimer.minutes, firstTimer.seconds, firstTimer.milliseconds);
+
+        secondTimer.start();
+
+        numbers = searchEngine.searchNumbers(phoneBook, find);
+
+        secondTimer.stop();
+
+        try (FileWriter writer = new FileWriter(findNumbers)) {
+            for (String s : numbers) {
+                writer.write(s + "\n");
+            }
+        } catch (IOException e) {
+            System.out.printf("An exception occurs %s", e.getMessage());
+        }
+
+        searchTime = String.format("%d min. %d sec. %d ms.",
+                secondTimer.minutes, secondTimer.seconds, secondTimer.milliseconds);
+
+        firstTimer.stop();
+
+        resultTime = String.format("%d min. %d sec. %d ms.",
+                firstTimer.minutes, firstTimer.seconds, firstTimer.milliseconds);
+
+        System.out.println("Start searching (quick sort + binary search)...");
+        System.out.printf("Found %d / 500 entries.Time taken:  %s\n", numbers.length, resultTime);
+        System.out.printf("Sorting time: %s\n", sortTime);
+        System.out.printf("Searching time: %s\n", searchTime);
+
     }
 }

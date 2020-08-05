@@ -33,7 +33,7 @@ class JumpSearch implements SearchMethod {
             return null;
         }
 
-        if (phonebook[currentRight].equals(phonebook[0].split(" ")[1])) {
+        if (phonebook[currentRight].equals(phonebook[currentRight].substring(phonebook[currentRight].indexOf(" ") + 1))) {
             return phonebook[0].split(" ")[0];
         }
 
@@ -42,8 +42,7 @@ class JumpSearch implements SearchMethod {
         while (currentRight < phonebook.length - 1) {
             currentRight = Math.min(phonebook.length - 1, currentRight + jumpLength);
 
-            String name = phonebook[currentRight].split(" ")[1];
-            if (name.charAt(0) >= targetName.charAt(0)) {
+            if (phonebook[currentRight].substring(phonebook[currentRight].indexOf(" ") + 1).compareToIgnoreCase(targetName) > 0) {
                 for (int i = currentRight; i > prevRight; i--) {
                     if (phonebook[i].split(" ")[1].equals(targetName)) {
                         return phonebook[i];
@@ -54,7 +53,7 @@ class JumpSearch implements SearchMethod {
         }
 
         if ((currentRight == phonebook.length - 1)
-                && targetName.charAt(0) > phonebook[currentRight].split(" ")[1].charAt(0)) {
+                && targetName.compareTo(phonebook[currentRight].substring(phonebook[currentRight].indexOf(" ") + 1)) > 0) {
             return null;
         }
 
@@ -71,6 +70,37 @@ class JumpSearch implements SearchMethod {
         }
 
         return numbers;
+    }
+}
+
+class BinarySearch implements SearchMethod {
+
+    @Override
+    public String[] searchNumbers(String[] phoneBook, String[] names) {
+        String[] numbers = new String[names.length];
+
+        for (int i = 0; i < names.length; i++) {
+            numbers[i] = binarySearch(phoneBook, names[i], 0, phoneBook.length - 1);
+        }
+
+        return numbers;
+    }
+
+    public String binarySearch(String[] array, String targetName, int left, int right) {
+        if (left > right) {
+            return null;
+        }
+
+        int mid = (left + right) >>> 1;
+        String arrayName = array[mid].substring(array[mid].indexOf(" ") + 1);
+
+        if (targetName.equals(arrayName)) {
+            return array[mid];
+        } else if (targetName.compareTo(arrayName) < 0) {
+            return binarySearch(array, targetName, left, mid - 1); // go to the left subarray
+        } else {
+            return binarySearch(array, targetName, mid + 1, right); // go the the right subarray
+        }
     }
 }
 
